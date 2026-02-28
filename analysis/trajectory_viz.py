@@ -214,7 +214,7 @@ def plot_rtg_sensitivity(
         action_history  = []
         step = 0
 
-        while step < 200:
+        while step < 1000:
             s_t, a_t, r_t, ts_t = _make_tensors(
                 states_buf, actions_buf, rtg_buf, ts_buf, K
             )
