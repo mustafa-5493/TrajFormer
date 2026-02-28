@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+
+# Data — too large for GitHub
+data/trajectories/
+data/cache/
+
+# Model checkpoints — too large
+outputs/checkpoints/
+
+# Exports
+outputs/exports/
+
+# OS
+.DS_Store
+Thumbs.db
