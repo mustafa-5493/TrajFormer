@@ -1,0 +1,10 @@
+{
+  "device": "NVIDIA GeForce GTX 1050",
+  "total_vram_mb": 4095.875,
+  "baseline_mb": 0.0,
+  "model_load_mb": 5.1201171875,
+  "single_inference_peak_mb": 14.30615234375,
+  "batch_inference_peak_mb": 81.24560546875,
+  "batch_size": 64,
+  "training_step_peak_mb": 332.49755859375
+}

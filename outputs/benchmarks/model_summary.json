@@ -1,0 +1,9 @@
+{
+  "architecture": "Decision Transformer",
+  "state_dim": 11,
+  "action_dim": 3,
+  "d_model": 128,
+  "context_length": 20,
+  "trainable_params": 1334275,
+  "total_params": 1334275
+}

@@ -1,0 +1,22 @@
+{
+  "n_episodes": 500,
+  "total_transitions": 209621,
+  "mean_reward": 1533.9757080078125,
+  "std_reward": 735.8328857421875,
+  "mean_length": 419.242,
+  "min_reward": 1030.6424560546875,
+  "max_reward": 3640.7548828125,
+  "action_std": [
+    0.40924006700515747,
+    0.5771076679229736,
+    0.7089324593544006
+  ],
+  "action_mean": [
+    0.0030687684193253517,
+    0.12473046779632568,
+    -0.0627916231751442
+  ],
+  "agent": "SAC pretrained (sb3/sac-Hopper-v3)",
+  "env": "Hopper-v4",
+  "deterministic": false
+}
