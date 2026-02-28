@@ -2,7 +2,6 @@
 
 A Decision Transformer trained from scratch on a GTX 1050 (4GB VRAM) to control a simulated hopping robot. Attention, positional encoding, and transformer blocks are written from scratch — no `nn.Transformer`.
 
-
 ---
 
 ## What This Is
@@ -30,6 +29,10 @@ This is the same architectural paradigm behind RT-2, Decision Transformer, and m
 | Expert SAC | ~3000+ | ~1000 steps |
 
 Evaluated over 20 rollout episodes in Hopper-v4. The model keeps the robot upright and moving forward for 602 steps on average — compared to 21 steps for a random agent.
+
+![Predicted vs expert actions](outputs/plots/action_prediction.png)
+
+![RTG sensitivity](outputs/plots/rtg_sensitivity.png)
 
 ---
 
@@ -105,6 +108,7 @@ Everything in `core/` is written from scratch. The attention mechanism, causal m
 **Schedule:** Linear warmup (500 steps) → cosine decay. AdamW, lr=1e-4, weight_decay=1e-4. Gradient clipping at 1.0.
 
 **Hardware:** NVIDIA GTX 1050, 4GB VRAM. AMP enabled. ~4 min/epoch.
+
 ```
 Epoch 001: train=0.0978  val=0.0602
 Epoch 006: train=0.0411  val=0.0444
@@ -130,7 +134,7 @@ TrajFormer/
 │   ├── train.py          # Training loop with sanity checks
 │   └── evaluate.py       # Environment rollout evaluation
 ├── data/
-│   └── collect.py        # Expert trajectory collection (SAC agent)
+│   └── collect.py        # Mixed-quality trajectory collection
 ├── analysis/
 │   ├── attention_viz.py  # Attention heatmaps + token type patterns
 │   └── trajectory_viz.py # Predicted vs actual trajectory plots
@@ -151,10 +155,10 @@ pip install torch==2.1.0+cu118 torchvision==0.16.0+cu118 \
 pip install gymnasium[mujoco] stable-baselines3 huggingface-sb3 \
     huggingface-hub shimmy numpy matplotlib tqdm scikit-learn
 
-# Collect expert data (~5 min)
+# Collect mixed-quality data (~15 min)
 python data/collect.py
 
-# Train (~2-4 hours on GTX 1050)
+# Train (~2 hours on GTX 1050)
 python src/train.py
 
 # Evaluate
@@ -166,27 +170,15 @@ python analysis/attention_viz.py
 
 ---
 
-
-
 ## RTG Conditioning
 
-The model responds to return-to-go conditioning but not monotonically.
-RTG=500 produces the best performance (2848 reward, 762 steps) — 
-significantly ahead of higher targets. Performance drops sharply at 
-RTG=1000 then plateaus from RTG=1500 onward at ~1200 reward.
+The model responds to return-to-go conditioning but not monotonically. RTG=500 produces the best performance (2848 reward, 762 steps) — significantly ahead of higher targets. Performance drops sharply at RTG=1000 then plateaus from RTG=1500 onward at ~1200 reward.
 
-This is a dataset distribution artifact. RTG=500 sits between the 
-random tier (5-100 reward) and medium tier (1000-2000 reward) — a 
-gap the model never saw during training. Queried at this value it 
-defaults to stable learned behavior without being pulled toward 
-out-of-distribution expert actions it cannot reliably execute.
+This is a dataset distribution artifact. RTG=500 sits between the random tier (5-100 reward) and medium tier (1000-2000 reward) — a gap the model never saw during training. Queried at this value it defaults to stable learned behavior without being pulled toward out-of-distribution expert actions it cannot reliably execute.
 
-Setting RTG too high (1500-3000) asks the model to reproduce expert 
-trajectories it has seen only 200 times out of 500 episodes. It 
-overreaches and falls over sooner.
+Setting RTG too high (1500-3000) asks the model to reproduce expert trajectories it has seen only 200 times out of 500 episodes. It overreaches and falls over sooner.
 
-The practical finding: for this model and dataset, RTG=500 is the 
-optimal inference target despite the expert tier reaching 3659.
+The practical finding: for this model and dataset, RTG=500 is the optimal inference target despite the expert tier reaching 3659.
 
 ---
 
