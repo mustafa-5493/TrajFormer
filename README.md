@@ -25,11 +25,11 @@ This is the same architectural paradigm behind RT-2, Decision Transformer, and m
 
 | Agent | Mean Return | Mean Episode Length |
 |---|---|---|
-| Random | 14.6 ± 9.3 | 20 steps |
-| **TrajFormer** | **1365.3 ± 200.5** | **369 steps** |
+| Random | 14.7 ± 7.5 | 21 steps |
+| **TrajFormer** | **2190.3 ± 1163.7** | **602 steps** |
 | Expert SAC | ~3000+ | ~1000 steps |
 
-Evaluated over 20 rollout episodes in Hopper-v4. The model keeps the robot upright and moving forward for 369 steps on average — compared to 20 steps for a random agent.
+Evaluated over 20 rollout episodes in Hopper-v4. The model keeps the robot upright and moving forward for 602 steps on average — compared to 21 steps for a random agent.
 
 ---
 
@@ -98,22 +98,21 @@ Everything in `core/` is written from scratch. The attention mechanism, causal m
 
 ## Training
 
-**Dataset:** 500 expert episodes collected using a pretrained SAC agent (sb3/sac-Hopper-v3 from HuggingFace). 209,621 total transitions. Mean episode reward 1534, mean length 419 steps.
+**Dataset:** 500 mixed-quality episodes — 200 expert (top 200 filtered from 400 collected), 200 medium, 100 random. 200,217 total transitions. Return range 5–3659 across three tiers.
 
 **Objective:** MSE between predicted and actual actions (behavior cloning).
 
 **Schedule:** Linear warmup (500 steps) → cosine decay. AdamW, lr=1e-4, weight_decay=1e-4. Gradient clipping at 1.0.
 
 **Hardware:** NVIDIA GTX 1050, 4GB VRAM. AMP enabled. ~4 min/epoch.
-
 ```
-Epoch 001: train=0.0956  val=0.0579
-Epoch 005: train=0.0417  val=0.0422
-Epoch 016: train=0.0319  val=0.0392  ← best
-Epoch 026: train=0.0283  val=0.0398  ← early stop
+Epoch 001: train=0.0978  val=0.0602
+Epoch 006: train=0.0411  val=0.0444
+Epoch 013: train=0.0342  val=0.0424  ← best
+Epoch 023: train=0.0295  val=0.0436  ← early stop
 ```
 
-Training completed in ~1.7 hours. Early stopping triggered after 26 epochs without val improvement.
+Training completed in ~1.6 hours. No improvement for 10 consecutive epochs triggered early stopping at epoch 23.
 
 ---
 
@@ -167,11 +166,27 @@ python analysis/attention_viz.py
 
 ---
 
-## Limitations
 
-**RTG conditioning is weak.** The model achieves ~600 reward regardless of target return-to-go value. This is a known failure mode of small Decision Transformers trained on datasets without sufficient return diversity — the model learns good average behavior but doesn't learn to modulate performance based on the conditioning signal. The original DT paper observes the same pattern on medium-quality datasets.
 
-The action prediction MSE (0.037–0.041) shows the model learned to imitate expert motion reasonably well — the behavior cloning objective works. The RTG conditioning does not.
+## RTG Conditioning
+
+The model responds to return-to-go conditioning but not monotonically.
+RTG=500 produces the best performance (2848 reward, 762 steps) — 
+significantly ahead of higher targets. Performance drops sharply at 
+RTG=1000 then plateaus from RTG=1500 onward at ~1200 reward.
+
+This is a dataset distribution artifact. RTG=500 sits between the 
+random tier (5-100 reward) and medium tier (1000-2000 reward) — a 
+gap the model never saw during training. Queried at this value it 
+defaults to stable learned behavior without being pulled toward 
+out-of-distribution expert actions it cannot reliably execute.
+
+Setting RTG too high (1500-3000) asks the model to reproduce expert 
+trajectories it has seen only 200 times out of 500 episodes. It 
+overreaches and falls over sooner.
+
+The practical finding: for this model and dataset, RTG=500 is the 
+optimal inference target despite the expert tier reaching 3659.
 
 ---
 
