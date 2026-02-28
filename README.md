@@ -95,7 +95,7 @@ Action head: state token representations → predicted actions
 | Context length K | 20 timesteps (60 tokens) |
 | Trainable parameters | 1,334,275 |
 
-Everything in `core/` is written from scratch. The attention mechanism, causal mask, multi-head projection, sinusoidal encoding, and transformer blocks do not use `nn.Transformer` or `nn.MultiheadAttention`.
+Everything in `core/` is written from scratch. 
 
 ---
 
