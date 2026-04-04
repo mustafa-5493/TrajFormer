@@ -59,7 +59,7 @@ This is physically correct. To predict joint torques, the model looks at joint p
 
 ![Token type attention patterns](outputs/plots/attention_token_types.png)
 
-The causal mask holds perfectly across all layers — clean lower-triangular structure, no future token leakage.
+The causal mask holds perfectly across all layers , clean lower-triangular structure visible and no future token leakage present.
 
 ![Attention across all layers](outputs/plots/attention_summary.png)
 
