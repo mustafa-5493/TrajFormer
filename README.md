@@ -1,6 +1,6 @@
 # TrajFormer
 
-A Decision Transformer trained from scratch on a GTX 1050 (4GB VRAM) to control a simulated hopping robot. Attention, positional encoding, and transformer blocks are written from scratch.
+A minimal, from-scratch Decision Transformer optimized for real-time control of a simulated hopping robot.
 
 ---
 
