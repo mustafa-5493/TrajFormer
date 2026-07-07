@@ -105,7 +105,7 @@ TrajFormer is designed for rapid, resource-efficient convergence, achieving peak
 
 * **Dataset:** 500 mixed-quality episodes (200 expert, 200 medium, 100 random) yielding 200,217 total transitions. Returns range from 5 to 3659 across the three performance tiers.
 * **Objective:** Mean Squared Error (MSE) between predicted and actual actions (behavior cloning).
-* **Optimization:** AdamW ($lr=1e-4$, $weight\_decay=1e-4$) with a 500-step linear warmup transitioning into a cosine decay schedule. Gradients are clipped at 1.0.
+* **Optimization:** AdamW (lr = 1e-4, weight_decay = 1e-4) with a 500-step linear warmup transitioning into a cosine decay schedule. Gradients are clipped at 1.0.
 * **Compute Profile:** Highly lightweight. Training requires less than **400 MB of VRAM** (with Automatic Mixed Precision enabled), taking roughly 4 minutes per epoch.
 
 ### Convergence Profile
