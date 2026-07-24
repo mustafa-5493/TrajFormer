@@ -1,4 +1,4 @@
-# TrajFormer
+# Decision Transformer — Hopper
 
 A minimal, from-scratch Decision Transformer optimized for real-time control of a simulated hopping robot.
 
@@ -25,7 +25,7 @@ Where R is reward-to-go, s is the 11-dimensional Hopper state, and a is the 3-di
 | Agent | Mean Return | Mean Episode Length |
 |---|---|---|
 | Random | 14.7 ± 7.5 | 21 steps |
-| **TrajFormer** | **2190.3 ± 1163.7** | **602 steps** |
+| **Decision Transformer** | **2190.3 ± 1163.7** | **602 steps** |
 | Expert SAC | ~3000+ | ~1000 steps |
 
 Evaluated over 20 rollout episodes in Hopper-v4. The model keeps the robot upright and moving forward for 602 steps on average — compared to 21 steps for a random agent.
@@ -122,13 +122,13 @@ Epoch 023: train=0.0295  val=0.0436  ← early stopping
 ## Project Structure
 
 ```
-TrajFormer/
+decision-transformer-hopper/
 ├── core/
 │   ├── attention.py      # Scaled dot-product + multi-head attention
 │   ├── positional.py     # Sinusoidal PE + learned timestep embedding
 │   └── transformer.py    # Decoder blocks + full decoder stack
 ├── src/
-│   ├── model.py          # TrajFormer: full Decision Transformer
+│   ├── model.py          # Full Decision Transformer model
 │   ├── dataset.py        # Trajectory windows + normalization
 │   ├── train.py          # Training loop with sanity checks
 │   └── evaluate.py       # Environment rollout evaluation
