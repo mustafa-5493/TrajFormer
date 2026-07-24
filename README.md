@@ -6,7 +6,7 @@ A minimal, from-scratch Decision Transformer optimized for real-time control of 
 
 ## What This Is
 
-Decision Transformer (Chen et al. 2021) reformulates robot control as sequence modeling. Instead of learning a value function or a policy gradient, the model learns to predict actions conditioned on a desired return-to-go — essentially, you tell it how well you want it to perform, and it figures out the actions that historically led to that outcome.
+This is the sequence-modeling formulation used by Decision Transformer and the RT-series robot policies — an implementation of that idea, written from scratch for transparency.
 
 The input sequence looks like this:
 
@@ -16,7 +16,7 @@ The input sequence looks like this:
 
 Where R is reward-to-go, s is the 11-dimensional Hopper state, and a is the 3-dimensional joint torque command. At inference, set R high — the model produces actions that match that target.
 
-This is the same architectural paradigm behind RT-2, Decision Transformer, and most modern robot foundation models. This project is a minimal, fully transparent implementation of that idea.
+
 
 ---
 
@@ -99,24 +99,23 @@ Everything in `core/` is written from scratch.
 
 ---
 
-## Training & Convergence
+### Training & Convergence
 
-TrajFormer is designed for rapid, resource-efficient convergence, achieving peak performance in under two hours without requiring heavy compute infrastructure.
-
-* **Dataset:** 500 mixed-quality episodes (200 expert, 200 medium, 100 random) yielding 200,217 total transitions. Returns range from 5 to 3659 across the three performance tiers.
-* **Objective:** Mean Squared Error (MSE) between predicted and actual actions (behavior cloning).
-* **Optimization:** AdamW (lr = 1e-4, weight_decay = 1e-4) with a 500-step linear warmup transitioning into a cosine decay schedule. Gradients are clipped at 1.0.
-* **Compute Profile:** Highly lightweight. Training requires less than **400 MB of VRAM** (with Automatic Mixed Precision enabled), taking roughly 4 minutes per epoch.
+* **Dataset:** 500 mixed-quality episodes (200 expert, 200 medium, 100 random), 200,217 transitions. Returns range 5–3659 across tiers.
+* **Objective:** MSE between predicted and actual actions (behavior cloning).
+* **Optimization:** AdamW (lr=1e-4, weight_decay=1e-4), 500-step linear warmup into cosine decay. Gradient clipping at 1.0.
+* **Compute:** <400MB VRAM with AMP, ~4 min/epoch, converges in under 2 hours on a GTX 1050.
 
 ### Convergence Profile
 
-The model targets swift behavioral alignment, with validation loss stabilizing early:
+Validation loss plateaus by epoch 13; early stopping triggers at epoch 23.
 
 ```text
 Epoch 001: train=0.0978  val=0.0602
 Epoch 006: train=0.0411  val=0.0444
-Epoch 013: train=0.0342  val=0.0424  ← Optimal Weights (Saved)
-Epoch 023: train=0.0295  val=0.0436  ← Early Stopping Triggered
+Epoch 013: train=0.0342  val=0.0424  ← best weights saved
+Epoch 023: train=0.0295  val=0.0436  ← early stopping
+```
 
 ---
 
